@@ -170,6 +170,69 @@
       </style>
    </head>
    <body>
+      <script>
+         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyC-Sd8KnJHsNkRO5okXFuZeLTLkuDl9IVo",
+    authDomain: "jacquard-5f340.firebaseapp.com",
+    projectId: "jacquard-5f340",
+    storageBucket: "jacquard-5f340.firebasestorage.app",
+    messagingSenderId: "714634004419",
+    appId: "1:714634004419:web:8c8cdc488fcdcf9d70df76",
+    measurementId: "G-RQYR241SPG"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function checkAccess() {
+  const params = new URLSearchParams(window.location.search);
+  const key = params.get("key");
+  if (!key) deny();
+
+  const ref = doc(db, "licenses", key);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) deny();
+
+  const data = snap.data();
+  if (!data.active) deny();
+
+  const deviceId = getDeviceId();
+
+  // First device binds
+  if (!data.deviceId) {
+    await updateDoc(ref, { deviceId: deviceId });
+    return; // access allowed
+  }
+
+  // Other device blocked
+  if (data.deviceId !== deviceId) deny();
+}
+
+function deny() {
+  document.body.innerHTML = "<h2>ACCESS DENIED</h2>";
+  throw new Error("Access blocked");
+}
+
+checkAccess();
+
+      </script>
       <h2>Fabric Cost Calculator</h2>
       <label>Pick on Loom: <input type="number" id="pick"></label>
       <label>
@@ -322,4 +385,5 @@
    </body>
 
 </html>
+
 

@@ -170,72 +170,6 @@
       </style>
    </head>
    <body>
-      <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-  import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyC-Sd8KnJHsNkRO5okXFuZeLTLkuDl9IVo",
-    authDomain: "jacquard-5f340.firebaseapp.com",
-    projectId: "jacquard-5f340",
-    storageBucket: "jacquard-5f340.appspot.com",
-    messagingSenderId: "714634004419",
-    appId: "1:714634004419:web:8c8cdc488fcdcf9d70df76"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  function getDeviceId() {
-    let id = localStorage.getItem("JC_DEVICE_ID");
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem("JC_DEVICE_ID", id);
-    }
-    return id;
-  }
-
-  function deny() {
-    document.body.innerHTML =
-      "<h2 style='text-align:center;margin-top:40px;color:red'>ACCESS DENIED</h2>";
-    throw new Error("Blocked");
-  }
-
-async function checkAccess() {
-  let key = new URLSearchParams(window.location.search).get("key");
-
-  if (key) {
-    localStorage.setItem("JC_LICENSE_KEY", key);
-  } else {
-    key = localStorage.getItem("JC_LICENSE_KEY");
-  }
-
-  if (!key) deny();
-
-  const ref = doc(db, "licenses", key);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) deny();
-
-  const data = snap.data();
-  if (!data.active) deny();
-
-  const deviceId = getDeviceId();
-
-  if (!data.deviceId) {
-    await updateDoc(ref, { deviceId });
-    return;
-  }
-
-  if (data.deviceId !== deviceId) deny();
-}
-
-
-  await checkAccess();
-
-  const s = document.createElement("script");
-  s.src = "script.min.js";
-  document.body.appendChild(s);
-</script>
       <h2>Fabric Cost Calculator</h2>
       <label>Pick on Loom: <input type="number" id="pick"></label>
       <label>
@@ -384,10 +318,8 @@ async function checkAccess() {
       <div class="result" id="totalCostResult">Total Cost: —</div>
       <div class="result" id="sellJobResult">Sell Job: —</div>
       <button id="installBtn" class="install-btn">Install App</button>
+      <script src="script.min.js"></script>
    </body>
 
 </html>
-
-
-
 

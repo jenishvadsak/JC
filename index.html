@@ -201,26 +201,34 @@
     throw new Error("Blocked");
   }
 
-  async function checkAccess() {
-    const key = new URLSearchParams(window.location.search).get("key");
-    if (!key) deny();
+async function checkAccess() {
+  let key = new URLSearchParams(window.location.search).get("key");
 
-    const ref = doc(db, "licenses", key);
-    const snap = await getDoc(ref);
-    if (!snap.exists()) deny();
-
-    const data = snap.data();
-    if (!data.active) deny();
-
-    const deviceId = getDeviceId();
-
-    if (!data.deviceId) {
-      await updateDoc(ref, { deviceId });
-      return;
-    }
-
-    if (data.deviceId !== deviceId) deny();
+  if (key) {
+    localStorage.setItem("JC_LICENSE_KEY", key);
+  } else {
+    key = localStorage.getItem("JC_LICENSE_KEY");
   }
+
+  if (!key) deny();
+
+  const ref = doc(db, "licenses", key);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) deny();
+
+  const data = snap.data();
+  if (!data.active) deny();
+
+  const deviceId = getDeviceId();
+
+  if (!data.deviceId) {
+    await updateDoc(ref, { deviceId });
+    return;
+  }
+
+  if (data.deviceId !== deviceId) deny();
+}
+
 
   await checkAccess();
 
@@ -379,6 +387,7 @@
    </body>
 
 </html>
+
 
 
 
